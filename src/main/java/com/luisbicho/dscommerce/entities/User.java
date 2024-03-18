@@ -9,22 +9,23 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name="tb_user")
+@Table(name = "tb_user")
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(unique = true)
     private String email;
     private String phone;
     private LocalDate birthDate;
     private String password;
 
     @OneToMany(mappedBy = "client")
-    private List<Order> orders=new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
-    public User(){
+    public User() {
 
     }
 

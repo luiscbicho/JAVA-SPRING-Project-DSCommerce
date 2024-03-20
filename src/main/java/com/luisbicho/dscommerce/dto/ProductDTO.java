@@ -1,14 +1,21 @@
 package com.luisbicho.dscommerce.dto;
 
 import com.luisbicho.dscommerce.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 
 public class ProductDTO implements Serializable {
 
     private Long id;
+    @Size(min = 3, max = 80, message = "Name must contain between 3 and 80 characters")
+    @NotBlank(message = "Required Field")
     private String name;
+    @Size(min = 10, message = "Description must contain at least 10 characters")
     private String description;
+    @Positive(message = "Price must be positive")
     private Double price;
     private String imgUrl;
 

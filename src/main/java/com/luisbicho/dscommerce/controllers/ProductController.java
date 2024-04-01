@@ -25,9 +25,8 @@ public class ProductController {
         return ResponseEntity.ok().body(productDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        Page<ProductDTO> productDTOS = productService.findAll(pageable);
+    @GetMapping    public ResponseEntity<Page<ProductDTO>> findAll(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
+        Page<ProductDTO> productDTOS = productService.findAll(name, pageable);
         return ResponseEntity.ok().body(productDTOS);
     }
 
@@ -38,7 +37,7 @@ public class ProductController {
         return ResponseEntity.created(uri).body(productDTO);
     }
 
-    @PostMapping(value = "/{id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
         productDTO = productService.update(id, productDTO);
         return ResponseEntity.ok(productDTO);

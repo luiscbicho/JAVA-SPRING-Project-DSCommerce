@@ -6,11 +6,10 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class OrderItemPK implements Serializable {
+public class OrderItemPK {
 
     @ManyToOne
     @JoinColumn(name = "order_id")

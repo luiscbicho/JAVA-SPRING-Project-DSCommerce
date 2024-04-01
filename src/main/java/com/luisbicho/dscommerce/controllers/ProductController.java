@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,11 +26,13 @@ public class ProductController {
         return ResponseEntity.ok().body(productDTO);
     }
 
-    @GetMapping    public ResponseEntity<Page<ProductDTO>> findAll(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
+    @GetMapping
+    public ResponseEntity<Page<ProductDTO>> findAll(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
         Page<ProductDTO> productDTOS = productService.findAll(name, pageable);
         return ResponseEntity.ok().body(productDTOS);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO productDTO) {
         productDTO = productService.insert(productDTO);
@@ -37,12 +40,14 @@ public class ProductController {
         return ResponseEntity.created(uri).body(productDTO);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
         productDTO = productService.update(id, productDTO);
         return ResponseEntity.ok(productDTO);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         productService.deleteById(id);

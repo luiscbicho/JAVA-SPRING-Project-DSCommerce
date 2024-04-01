@@ -2,13 +2,12 @@ package com.luisbicho.dscommerce.entities;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
 @Entity
 @Table(name = "tb_payment")
-public class Payment implements Serializable {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

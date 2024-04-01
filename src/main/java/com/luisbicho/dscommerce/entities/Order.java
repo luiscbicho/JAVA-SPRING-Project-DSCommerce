@@ -3,7 +3,6 @@ package com.luisbicho.dscommerce.entities;
 import com.luisbicho.dscommerce.entities.enums.OrderStatus;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tb_order")
-public class Order implements Serializable {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

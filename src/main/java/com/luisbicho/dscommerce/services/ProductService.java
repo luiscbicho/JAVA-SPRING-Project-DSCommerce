@@ -1,7 +1,9 @@
 package com.luisbicho.dscommerce.services;
 
+import com.luisbicho.dscommerce.dto.CategoryDTO;
 import com.luisbicho.dscommerce.dto.ProductDTO;
 import com.luisbicho.dscommerce.dto.ProductMinDTO;
+import com.luisbicho.dscommerce.entities.Category;
 import com.luisbicho.dscommerce.entities.Product;
 import com.luisbicho.dscommerce.repositories.ProductRepository;
 import com.luisbicho.dscommerce.services.exceptions.DatabaseException;
@@ -73,5 +75,12 @@ public class ProductService {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setImgUrl(productDTO.getImgUrl());
+        product.getCategories().clear();
+        for (CategoryDTO catDTO : productDTO.getCategories()) {
+            Category cat = new Category();
+            cat.setId(catDTO.getId());
+            cat.setName(catDTO.getName());
+            product.getCategories().add(cat);
+        }
     }
 }

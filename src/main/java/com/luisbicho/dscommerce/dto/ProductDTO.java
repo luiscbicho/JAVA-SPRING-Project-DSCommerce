@@ -1,11 +1,15 @@
 package com.luisbicho.dscommerce.dto;
 
+import com.luisbicho.dscommerce.entities.Category;
 import com.luisbicho.dscommerce.entities.Product;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDTO implements Serializable {
 
@@ -18,6 +22,9 @@ public class ProductDTO implements Serializable {
     @Positive(message = "Price must be positive")
     private Double price;
     private String imgUrl;
+
+    @NotEmpty(message = "At least one category")
+    private List<CategoryDTO> categories = new ArrayList<>();
 
     public ProductDTO() {
     }
@@ -36,6 +43,9 @@ public class ProductDTO implements Serializable {
         description = product.getDescription();
         price = product.getPrice();
         imgUrl = product.getImgUrl();
+        for (Category cat : product.getCategories()) {
+            categories.add(new CategoryDTO(cat));
+        }
     }
 
     public Long getId() {
@@ -56,5 +66,9 @@ public class ProductDTO implements Serializable {
 
     public String getImgUrl() {
         return imgUrl;
+    }
+
+    public List<CategoryDTO> getCategories() {
+        return categories;
     }
 }

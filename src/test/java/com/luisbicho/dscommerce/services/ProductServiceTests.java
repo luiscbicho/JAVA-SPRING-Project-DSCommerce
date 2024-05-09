@@ -1,6 +1,7 @@
 package com.luisbicho.dscommerce.services;
 
 import com.luisbicho.dscommerce.dto.ProductDTO;
+import com.luisbicho.dscommerce.dto.ProductMinDTO;
 import com.luisbicho.dscommerce.entities.Product;
 import com.luisbicho.dscommerce.factory.ProductFactory;
 import com.luisbicho.dscommerce.repositories.ProductRepository;
@@ -12,10 +13,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(SpringExtension.class)
 public class ProductServiceTests {
@@ -30,6 +37,7 @@ public class ProductServiceTests {
     private String productName;
     private Product product;
     private List<Product> products;
+    private PageImpl<Product> page;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -38,8 +46,11 @@ public class ProductServiceTests {
         productName = "Playstation 5";
         product = ProductFactory.createProduct(productName);
 
+        page = new PageImpl<>(List.of(product));
+
         Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
         Mockito.when(repository.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+        Mockito.when(repository.searchByName(any(), (Pageable) any())).thenReturn(page);
     }
 
     @Test
@@ -60,5 +71,16 @@ public class ProductServiceTests {
             service.findById(nonExistingId);
         });
 
+    }
+
+    @Test
+    public void findAllShouldReturnPagedProductMinDTO() {
+        Pageable pageable = PageRequest.of(0, 12);
+        Page<ProductMinDTO> productDTOPage = service.findAll(productName, pageable);
+
+        Assertions.assertNotNull(productDTOPage);
+        Assertions.assertEquals(productDTOPage.getSize(), 1);
+        Assertions.assertEquals(productDTOPage.iterator().next().getName(), productName);
+        
     }
 }

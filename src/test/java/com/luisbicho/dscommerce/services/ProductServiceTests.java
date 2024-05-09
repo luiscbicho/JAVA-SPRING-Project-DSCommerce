@@ -5,6 +5,7 @@ import com.luisbicho.dscommerce.dto.ProductMinDTO;
 import com.luisbicho.dscommerce.entities.Product;
 import com.luisbicho.dscommerce.factory.ProductFactory;
 import com.luisbicho.dscommerce.repositories.ProductRepository;
+import com.luisbicho.dscommerce.services.exceptions.DatabaseException;
 import com.luisbicho.dscommerce.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,9 +34,10 @@ public class ProductServiceTests {
     @Mock
     private ProductRepository repository;
 
-    private Long existingId, nonExistingId;
+    private Long existingId, nonExistingId, dependentId;
     private String productName;
     private Product product;
+    private ProductDTO productDTO;
     private List<Product> products;
     private PageImpl<Product> page;
 
@@ -43,14 +45,25 @@ public class ProductServiceTests {
     public void setUp() throws Exception {
         existingId = 1L;
         nonExistingId = 2L;
+        dependentId = 3L;
         productName = "Playstation 5";
         product = ProductFactory.createProduct(productName);
-
+        productDTO = new ProductDTO(product);
         page = new PageImpl<>(List.of(product));
 
         Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
         Mockito.when(repository.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
         Mockito.when(repository.searchByName(any(), (Pageable) any())).thenReturn(page);
+        Mockito.when(repository.save(any())).thenReturn(product);
+        Mockito.when(repository.getReferenceById(existingId)).thenReturn(product);
+        Mockito.when(repository.getReferenceById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+        Mockito.when(repository.existsById(existingId)).thenReturn(true);
+        Mockito.when(repository.existsById(nonExistingId)).thenReturn(false);
+        Mockito.when(repository.existsById(dependentId)).thenReturn(true);
+        Mockito.doNothing().when(repository).deleteById(existingId);
+        Mockito.doThrow(DatabaseException.class).when(repository).deleteById(dependentId);
+
+
     }
 
     @Test
@@ -81,6 +94,62 @@ public class ProductServiceTests {
         Assertions.assertNotNull(productDTOPage);
         Assertions.assertEquals(productDTOPage.getSize(), 1);
         Assertions.assertEquals(productDTOPage.iterator().next().getName(), productName);
-        
+
+    }
+
+    @Test
+    public void insertShouldReturnProductDTO() {
+        ProductDTO result = service.insert(productDTO);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(result.getId(), productDTO.getId());
+        Assertions.assertEquals(result.getName(), productDTO.getName());
+    }
+
+    @Test
+    public void updateShouldReturnProductDTOWhenIdExists() {
+
+        ProductDTO result = service.update(existingId, productDTO);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(result.getId(), existingId);
+        Assertions.assertEquals(result.getName(), productDTO.getName());
+
+    }
+
+    @Test
+    public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            service.update(nonExistingId, productDTO);
+        });
+
+    }
+
+    @Test
+    public void deleteShouldDoNothingWhenIdExists() {
+        Assertions.assertDoesNotThrow(() -> {
+            service.deleteById(existingId);
+        });
+
+        Mockito.verify(repository, Mockito.times(1)).deleteById(existingId);
+
+    }
+
+    @Test
+    public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            service.deleteById(nonExistingId);
+        });
+
+    }
+
+    @Test
+    public void deleteShouldThrowDatabaseExceptionWhenDependentId() {
+
+        Assertions.assertThrows(DatabaseException.class, () -> {
+            service.deleteById(dependentId);
+        });
     }
 }

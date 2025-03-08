@@ -23,7 +23,7 @@ The system consists of the following main entities:
 
 ### UML Diagram
 
-[uml-diagram-fixed.png](https://postimg.cc/8FyLwvSS)
+[![uml-diagram-fixed.png](https://i.postimg.cc/NMtbs8C5/uml-diagram-fixed.png)](https://postimg.cc/8FyLwvSS)
 
 ## Technologies Used
 
